@@ -140,7 +140,7 @@ export default class Migrator {
 
     const untilMigration = migrationName ?
       await MigrationModel.findOne({name: migrationName}) :
-      await MigrationModel.findOne().sort({createdAt: directions == 'up' ? -1 : 1});
+      await MigrationModel.findOne().sort({createdAt: direction === 'up' ? -1 : 1});
 
     if (!untilMigration) {
       if (migrationName) throw new ReferenceError("Could not find that migration in the database");
