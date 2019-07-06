@@ -63,7 +63,6 @@ Commands:
 Options:
   -d, --dbConnectionUri   The URI of the database connection                           [string] [required]
   --collection            The mongo collection name to use for migrations [string] [default: "migrations"]
-  --es6                   use es6 migration templates?                                           [boolean]
   --md, --migrations-dir  The path to the migration files               [string] [default: "./migrations"]
   -t, --template-file     The template file to use when creating a migration                      [string]
   -c, --change-dir        Change current working directory before running  anything               [string]
@@ -109,43 +108,8 @@ Just make sure you don't have aliases of the same option with 2 different values
 #### Migration Files
 Here's how you can access your `mongoose` models and handle errors in your migrations
 
-**ES5 Example**
-```javascript
-'use strict';
 
-var lib = require('myLibrary');
-
-/**
- * Make any changes you need to make to the database here
- */
-exports.up = function up (done) {
-  return lib.doSomeWork().then(function() {
-    // Don't forget to call done() or the migration will never finish!
-    done();
-  })
-  .catch(function(error){
-    // If you get an error in your async operations you can call done like so
-    done(error);
-  });
-  
-  // Throwing errors also works
-  throw new Error('It should never get here!');
-};
-
-/**
- * Make any changes that UNDO the up function side effects here (if possible)
- */
-exports.down = function down(done) {
-  lib.undoAboveWork().then(function() {
-      done();
-    })
-    .catch(function(error){
-      done(error);
-    });
-};
-```
-
-**ES6 Example**
+**Example (ES6+)**
 ```javascript
 /**
  * Easy flow control

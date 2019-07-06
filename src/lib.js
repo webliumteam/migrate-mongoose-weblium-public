@@ -14,7 +14,7 @@ Promise.config({
   warnings: false
 });
 
-const es6Template =
+const migrationTemplate =
 `
 /**
  * Make any changes you need to make to the database here
@@ -31,41 +31,20 @@ export async function down () {
 }
 `;
 
-const es5Template =
-`'use strict';
-
-/**
- * Make any changes you need to make to the database here
- */
-exports.up = function up (done) {
-  done();
-};
-
-/**
- * Make any changes that UNDO the up function side effects here (if possible)
- */
-exports.down = function down(done) {
-  done();
-};
-`;
-
-
 export default class Migrator {
   constructor({
     templatePath,
     migrationsPath = './migrations',
     dbConnectionUri,
-    es6Templates = false,
     collectionName = 'migrations',
     autosync = false,
     cli = false,
     connection
   }) {
-    const defaultTemplate = es6Templates ?  es6Template : es5Template;
+    const defaultTemplate = migrationTemplate;
     this.template = templatePath ? fs.readFileSync(templatePath, 'utf-8') : defaultTemplate;
     this.migrationPath = path.resolve(migrationsPath);
     this.connection = connection || mongoose.createConnection(dbConnectionUri);
-    this.es6 = es6Templates;
     this.collection = collectionName;
     this.autosync = autosync;
     this.cli = cli;
@@ -178,28 +157,11 @@ export default class Migrator {
 
     for (const migration of migrationsToRun) {
       const migrationFilePath = path.join(self.migrationPath, migration.filename);
-      if (this.es6) {
-        require('babel-register')({
-          "presets": [require("babel-preset-latest")],
-          "plugins": [require("babel-plugin-transform-runtime")]
-        });
-
-        require('babel-polyfill');
-      }
-
       let migrationFunctions;
-
-      try {
-        migrationFunctions = require(migrationFilePath);
-      } catch (err) {
-        err.message = err.message && /Unexpected token/.test(err.message) ?
-          'Unexpected Token when parsing migration. If you are using an ES6 migration file, use option --es6' :
-          err.message;
-        throw err;
-      }
-
+      migrationFunctions = require(migrationFilePath);
+      
       if (!migrationFunctions[direction]) {
-        throw new Error (`The ${direction} export is not defined in ${migration.filename}.`.red);
+        throw new Error (`The "${direction}" export is not defined in ${migration.filename}.`.red);
       }
 
       try {
