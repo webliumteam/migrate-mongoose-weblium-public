@@ -170,7 +170,6 @@ export default class Migrator {
         this.log(`Current Migrations' Statuses: `);
         await this.list();
       }
-      throw new Error('There are no migrations to run');
     }
 
     let self = this;
@@ -230,7 +229,7 @@ export default class Migrator {
       }
     }
 
-    if (migrationsToRun.length == numMigrationsRan) this.log('All migrations finished successfully.'.green);
+    if (migrationsToRun.length == numMigrationsRan && numMigrationsRan > 0) this.log('All migrations finished successfully.'.green);
     return migrationsRan;
   }
 
