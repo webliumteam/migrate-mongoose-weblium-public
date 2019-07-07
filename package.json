@@ -2,21 +2,26 @@
   "name": "migrate-mongoose",
   "version": "3.2.2",
   "description": "A mongoose based migration framework for node",
-  "main": "./lib/lib.js",
+  "main": "./src/lib.js",
   "scripts": {
     "prepublish": "scripts/prepublish.sh",
-    "postversion": "git push && git push --tags",
+    "release": "np",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "migrate": "./lib/cli.js"
+    "migrate": "./src/cli.js"
+  },
+  "np": {
+    "tests": false
   },
   "keywords": [
     "migrate",
     "migration",
     "mongoose",
     "schema",
-    "mongodb"
+    "mongodb",
+    "db",
+    "nosql"
   ],
   "author": "Borna Almasi <borna@borna-almasi.com>",
   "license": "MIT",
@@ -27,9 +32,13 @@
   "dependencies": {
     "bluebird": "^3.3.3",
     "colors": "^1.1.2",
+    "dotenv": "^8.0.0",
     "inquirer": "^0.12.0",
     "mkdirp": "^0.5.1",
-    "mongoose": "^4.4.6",
+    "mongoose": "^5.6.3",
     "yargs": "^4.8.1"
+  },
+  "devDependencies": {
+    "np": "^5.0.3"
   }
 }
