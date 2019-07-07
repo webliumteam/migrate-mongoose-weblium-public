@@ -1,9 +1,11 @@
-import mongoose, { Schema }  from 'mongoose';
-import Promise from 'bluebird';
+const mongoose =  require('mongoose');
+const Promise = require('bluebird');
+
 // Factory function for a mongoose model
 mongoose.Promise = Promise;
+const { Schema } = mongoose;
 
-export default function ( collection = 'migrations', dbConnection ) {
+function initializeDB( collection = 'migrations', dbConnection) {
 
   const MigrationSchema = new Schema({
     name: String,
@@ -34,6 +36,7 @@ export default function ( collection = 'migrations', dbConnection ) {
     console.error(`MongoDB Connection Error: ${err}`);
   });
 
-  return dbConnection.model( collection, MigrationSchema );
+  return dbConnection.model(collection, MigrationSchema );
 }
 
+module.exports = initializeDB;

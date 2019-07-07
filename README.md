@@ -1,5 +1,5 @@
 # migrate-mongoose
-A node based migration framework for mongoose
+A node based migration framework for ES6+ for mongoose
 
 #### Motivation
 migrate-mongoose is a migration framework for projects which are already using mongoose.
@@ -89,6 +89,14 @@ If you want to not provide the options such as `--dbConnectionUri` to the progra
 ```
 export MIGRATE_dbConnectionUri=localhost/migrations
 ```
+
+`.env` files are also supported. All variables will be read from the `.env` file and set by migrate-mongoose.
+
+```bash
+#.env
+MIGRATE_dbConnectionUri=mongodb://localhost:27017/mydb
+```
+
 **2. Provide a config file (defaults to *migrate.json* or *migrate.js*)**
 ```bash
 # If you have migrate.json in the directory, you don't need to do anything
@@ -115,7 +123,7 @@ Here's how you can access your `mongoose` models and handle errors in your migra
  * Easy flow control
  */
 // Notice no need for callback 
-export async function up() {
+async function up() {
   // Error handling is as easy as throwing an error  
   if (condition) {
     throw new Error('This is an error. Could not complete migration');  
@@ -148,9 +156,9 @@ const UserSchema = new Schema({
 module.exports = mongoose.model('user', UserSchema);
 
 // 1459287720919-my-migration.js
-export async function up() {
+async function up() {
   // Then you can access it in the migration like so  
-  await this('user').update({}, {
+  await this('user').updateMany({}, {
     $rename: { firstName: 'first' }
   }, { multi: true });
   
@@ -172,4 +180,4 @@ example: `-d mongodb://localhost:27017/development` . If you don't want to pass 
 ### How to contribute
 1. Start an issue. We will discuss the best approach
 2. Make a pull request. I'll review it and comment until we are both confident about it
-3. Profit
+3. I'll merge your PR and bump the version of the package
