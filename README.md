@@ -21,7 +21,7 @@ migrate-mongoose is a migration framework for projects which are already using m
     
 
 
-### Getting Started
+### Getting Started with the CLI
 You can install it locally in your project
 ```
  npm install migrate-mongoose
@@ -31,7 +31,7 @@ and then run
 ./node_modules/.bin/migrate [command] [options]
 ```
 
-#### or
+#### OR
 
 Install it globally
 ```
@@ -82,10 +82,10 @@ Examples:
 ```
 
 
-#### Setting Options Automatically
+### Setting Options Automatically
 If you want to not provide the options such as `--dbConnectionUri` to the program every time you have 2 options.
 
-**1. Set the option as an Environment Variable with the prefix MIGRATE_**
+#### 1. Set the option as an Environment Variable with the prefix MIGRATE_
 ```
 export MIGRATE_dbConnectionUri=localhost/migrations
 ```
@@ -97,7 +97,7 @@ export MIGRATE_dbConnectionUri=localhost/migrations
 MIGRATE_dbConnectionUri=mongodb://localhost:27017/mydb
 ```
 
-**2. Provide a config file (defaults to *migrate.json* or *migrate.js*)**
+#### 2. Provide a config file (defaults to *migrate.json* or *migrate.js*)
 ```bash
 # If you have migrate.json in the directory, you don't need to do anything
 migrate list
@@ -107,17 +107,19 @@ migrate list --config somePath/myCustomConfigFile[.json]
 ```
 
 
-### Options Override Order:
+#### Options Override Order:
 Command line args _beat_ Env vars _beats_ Config File
 
 Just make sure you don't have aliases of the same option with 2 different values between env vars and config file
 
 
-#### Migration Files
-Here's how you can access your `mongoose` models and handle errors in your migrations
+### Migration Files
+By default, migrate-mongoose assumes your migration folder exists.
+
+Here's an example of a migration created using `migrate create some-migration-name` . This example demonstrates how you can access your `mongoose` models and handle errors in your migrations
 
 
-**Example (ES6+)**
+#### migrations/1562460744403-some-migration-name.js
 ```javascript
 /**
  * Easy flow control
@@ -139,43 +141,78 @@ async function up() {
   return lib.getPromise();
   
 }
+
+module.exports = { up, down };
 ```
 
 
-**Access to mongoose models**
+### Access to mongoose models in your migrations
 
+Just go about your business as usual, importing your models and making changes to your database.
+
+migrate-mongoose makes an independent connection to MongoDB to fetch and write migration states and makes no assumptions about your database configurations or even prevent you from making changes to multiple or even non-mongo databases in your migrations. As long as you can import the references to your models you can use them in migrations.
+
+Below is an example of a typical setup in a mongoose project
+
+#### models/user.model.js
 ```javascript
-// Lets say you have a user model like this
+mongoose = require('mongoose');
 
-// models/User.js
+const { Schema } = mongoose;
 const UserSchema = new Schema({
-  firstName: String,
-  lastName: String,
-});
-
+    firstName: String,
+    lastName: String,
+  });
 module.exports = mongoose.model('user', UserSchema);
+```
 
-// 1459287720919-my-migration.js
+
+#### models/index.js
+```javascript
+const mongoose = require('mongoose');
+const User = require('./user.model');
+
+mongoose.connect('mongodb://localhost:27017/mydb', { useNewUrlParser: true })
+
+module.exports = { User };
+```
+
+
+#### migrations/1459287720919-my-migration.js
+```javascript
+import { User } from '../models'
+
 async function up() {
-  // Then you can access it in the migration like so  
-  await this('user').updateMany({}, {
-    $rename: { firstName: 'first' }
-  }, { multi: true });
+  // Then you can use it in the migration like so  
+  await User.create({ firstName: 'Ada', lastName: 'Lovelace' });
   
-  // Or something such as
- const users = this('user').find();
- /* Do something with users */
- 
+  // OR do something such as
+  const users = await User.find();
+  /* Do something with users */
 }
 ```
 
+If you're using the package programmatically. You can access your models using the connection you constructed the Migrator with through the `this` context.
+
+```javascript
+async function up() {
+  // "this('user')"  is the same as calling "connection.model('user')" using the connection you passed to the Migrator constructor.
+  // 
+  await this('user').create({ firstName: 'Ada', lastName: 'Lovelace' });
+}
+```
 
 ### Notes
 
 Currently, the **-d**/**dbConnectionUri**  must include the database to use for migrations in the uri.
-example: `-d mongodb://localhost:27017/development` . If you don't want to pass it in every time feel free to use the
-`migrate.json` config file or an environment variable
 
+example: `-d mongodb://localhost:27017/development` . 
+
+If you don't want to pass it in every time feel free to use the `migrate.json` config file or an environment variable
+
+
+### Examples
+Feel Free to check out the examples in the project to get a better idea of usage
 
 ### How to contribute
 1. Start an issue. We will discuss the best approach

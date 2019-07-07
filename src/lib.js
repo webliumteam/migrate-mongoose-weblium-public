@@ -64,6 +64,7 @@ class Migrator {
    */
   setMongooseConnection(connection) {
     MigrationModel = MigrationModelFactory(this.collection, connection)
+    return this
   }
 
   /**
@@ -197,9 +198,11 @@ class Migrator {
   }
 
   /**
-   * Looks at the file system migrations and imports any migrations that are
-   * on the file system but missing in the database into the database
-   *
+   * sync file system -> database
+   * 
+   * Imports any migrations that are on the file system but
+   * missing in the database into the database
+   * 
    * This functionality is opposite of prune()
    */
   async sync() {
@@ -252,6 +255,8 @@ class Migrator {
   }
 
   /**
+   * sync migration database -> file system
+   * 
    * Opposite of sync().
    * Removes files in migration directory which don't exist in database.
    */
