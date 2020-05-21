@@ -1,4 +1,12 @@
-# migrate-mongoose
+# Fork info
+
+This project is a fork of **migrate-mongoose**.
+Only one reason to fork it - original project is not supported and security fixes can't be provided. 
+Where is no critical changes and upstream can be merged any time
+
+----------------------------------------
+
+# migrate-mongoose-weblium-public
 A node based migration framework for ES6+ for mongoose
 
 #### Motivation
@@ -24,7 +32,7 @@ migrate-mongoose is a migration framework for projects which are already using m
 ### Getting Started with the CLI
 You can install it locally in your project
 ```
- npm install migrate-mongoose
+ npm install --save migrate-mongoose-weblium-public
 ```
 and then run
 ```
@@ -35,7 +43,7 @@ and then run
 
 Install it globally
 ```
- npm install -g migrate-mongoose
+ npm install -g migrate-mongoose-weblium-public
 ```
 and then run
 ```
