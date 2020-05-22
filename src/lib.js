@@ -157,6 +157,8 @@ class Migrator {
     let numMigrationsRan = 0;
     let migrationsRan = [];
 
+    await this.establishConnection(self.migrationPath);
+
     for (const migration of migrationsToRun) {
       const migrationFilePath = path.join(self.migrationPath, migration.filename);
       let migrationFunctions;
@@ -195,6 +197,32 @@ class Migrator {
 
     if (migrationsToRun.length == numMigrationsRan && numMigrationsRan > 0) this.log('All migrations finished successfully.'.green);
     return migrationsRan;
+  }
+
+  /**
+   * Set mongoose connection for models
+   */
+  async establishConnection(migrationPath) {
+
+    const initFile = path.join(migrationPath, './init/init-connection.js');
+    try {
+      fs.accessSync(initFile, fs.constants.R_OK);
+    } catch (err) {
+      this.log(`Init connection file not found. Please check "${initFile}" path`.yellow);
+      return;
+    }
+
+    try {
+
+      const { init } = require(initFile);
+      await init();
+
+      this.log(`Mongoose connection established`.grey);
+
+    } catch (e) {
+      this.log(`Could not synchronise migrations in the migrations folder up to the database.`.red);
+      throw e;
+    }
   }
 
   /**
@@ -346,4 +374,3 @@ function fileRequired(error) {
 
 
 module.exports = Migrator;
-
